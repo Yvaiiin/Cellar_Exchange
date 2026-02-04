@@ -23,9 +23,9 @@ export class AuthService {
   readonly users = signal<User[]>([
     { 
       id: 'USER_1', 
-      firstname: 'Pierre', lastname: 'Admin', name: 'Pierre Admin', // Concaténé
-      company: 'WINE TRADING HQ', 
-      email: 'pierre@winetrading.com',
+      firstname: 'Admin', lastname: 'Admin', name: 'Admin', // Concaténé
+      company: 'CELLAR EXCHANGE', 
+      email: 'addmin@cellarexchange.com',
       phone: '+33 6 00 00 00 01',
       password: 'admin', 
       role: 'ADMIN', 
@@ -34,7 +34,7 @@ export class AuthService {
     { 
       id: 'USER_2', 
       firstname: 'Jean', lastname: 'Dupont', name: 'Jean Dupont',
-      company: 'MAISON DUPONT & FILS', 
+      company: 'Courtier A', 
       email: 'jean.dupont@domain.com',
       phone: '+33 6 12 34 56 78',
       password: 'user123', 

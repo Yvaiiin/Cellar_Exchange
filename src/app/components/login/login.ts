@@ -11,7 +11,7 @@ import { AuthService, UserRole } from '../../services/auth.service';
     <div class="min-h-screen bg-gray-50/50 flex flex-col items-center justify-center p-4 font-sans">
       
       <div class="text-center mb-8">
-        <div class="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white font-bold text-lg rounded mb-3 shadow-sm">W</div>
+        <div class="inline-flex items-center justify-center w-10 h-10 bg-slate-900 text-white font-bold text-lg rounded mb-3 shadow-sm">CE</div>
         <h1 class="text-xl font-bold text-slate-900 tracking-tight">CELLAR EXCHANGE <span class="text-slate-400 font-normal text-sm"> BETA</span></h1>
         <p class="text-xs text-gray-400 mt-1 uppercase tracking-widest">Sélection du profil</p>
       </div>
@@ -47,7 +47,7 @@ import { AuthService, UserRole } from '../../services/auth.service';
                     <div class="w-0.5 h-full bg-slate-200 rounded-full shrink-0"></div>
                     <div>
                         <p class="text-[11px] font-bold text-slate-700 uppercase tracking-wide mb-0.5">Opportunités</p>
-                        <p class="text-xs text-gray-500 leading-relaxed">Réponse directe aux demandes d'achat (acheteur).</p>
+                        <p class="text-xs text-gray-500 leading-relaxed">Réponse directe aux demandes d'achat.</p>
                     </div>
                 </div>
             </div>
@@ -81,8 +81,8 @@ import { AuthService, UserRole } from '../../services/auth.service';
                         <p class="text-xs text-gray-500 leading-relaxed">
                             Accès au catalogue des offres en temps réel.<br>
                             Possibilité de se positionner sur des offres.<br>
-                            Export PDF et marque blanche.<br>
-                            Filtres avancés.</p>
+                            Export PDF des offres (marque blanche).<br>
+                            Anonymat garanti.</p>
                     </div>
                 </div>
                 <div class="flex gap-3">

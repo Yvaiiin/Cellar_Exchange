@@ -25,7 +25,15 @@ import { AuthService } from '../../services/auth.service';
             <button (click)="openRequestCreationModal()" class="w-full py-2.5 bg-slate-900 hover:bg-slate-800 text-white text-sm font-bold rounded-md shadow-sm flex items-center justify-center gap-2 transition-all"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>Ajouter une demande</button>
         }
 
-        <div class="relative"><span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></span><input type="text" placeholder="Rechercher..." class="w-full py-2 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all"></div>
+        <div class="relative">
+           <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-gray-400"><svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg></span>
+           <input 
+             type="text" 
+             placeholder="Rechercher..." 
+             [ngModel]="searchQuery()" 
+             (ngModelChange)="searchQuery.set($event)"
+             class="w-full py-2 pl-9 pr-3 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:bg-white transition-all">
+        </div>
 
         @if (activeTab() === 'OFFRES') {
             <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
@@ -57,9 +65,13 @@ import { AuthService } from '../../services/auth.service';
                   </div>
                   <h3 class="text-sm font-bold text-slate-900 leading-tight mb-0.5">{{ offer.name }}</h3>
                   <div class="text-xs text-gray-500 mb-2">{{ offer.vintage }} • {{ offer.region }}</div>
+                  
                   <div class="flex justify-between items-end border-t border-gray-50 pt-2 mt-2">
                     <div class="flex gap-1"><span class="text-[10px] text-gray-500">{{ offer.logistics.qty }} x {{ offer.logistics.unit }}</span></div>
-                    <div class="text-right"><div class="text-sm font-bold text-slate-900 leading-none">{{ formatPrice(offer.price.unit * offer.logistics.qty) }}</div><div class="text-[10px] text-gray-400 font-medium mt-0.5">{{ formatPrice(offer.price.unit) }} / col</div></div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold text-slate-900 leading-none">{{ formatPrice(offer.price.unit * offer.logistics.qty) }}</div>
+                        <div class="text-[10px] text-gray-400 font-medium mt-0.5">{{ formatPrice(offer.price.unit) }} / col</div>
+                    </div>
                   </div>
                 </div>
             }
@@ -67,26 +79,27 @@ import { AuthService } from '../../services/auth.service';
         }
 
         @if (activeTab() === 'DEMANDES') {
-            @for (req of requestList(); track req.id) {
+            @for (req of filteredRequests(); track req.id) {
                 <div (click)="selectItem(req.id)" class="group p-4 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors relative">
                     <div class="flex justify-between items-start mb-1">
                         <div class="flex items-center gap-2">
                             <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold uppercase tracking-wider border bg-indigo-50 text-indigo-700 border-indigo-100">RECHERCHE</span>
-                            </div>
+                        </div>
                         <span class="text-[10px] text-gray-400 font-mono">#{{ req.id }}</span>
                     </div>
                     <h3 class="text-sm font-bold text-slate-900 leading-tight mb-0.5">{{ req.productName }}</h3>
                     <div class="text-xs text-gray-500 mb-2">{{ req.vintage }} • {{ req.format }}</div>
+                    
                     <div class="flex justify-between items-end border-t border-gray-50 pt-2 mt-2">
-                         <div class="flex gap-1"><span class="text-[10px] text-gray-500">Qte: {{ req.qty }}</span></div>
+                         <div class="flex gap-1"><span class="text-[10px] text-gray-500">{{ req.qty }} x {{ req.format }}</span></div>
                          <div class="text-right">
-                             <div class="text-sm font-bold text-slate-900 leading-none">Budget {{ formatPrice(req.targetPrice) }}</div>
-                             <div class="text-[10px] text-gray-400 font-medium mt-0.5">HT</div>
+                             <div class="text-sm font-bold text-slate-900 leading-none">{{ req.targetPrice > 0 ? formatPrice(req.targetPrice * req.qty) : 'NC' }}</div>
+                             <div class="text-[10px] text-gray-400 font-medium mt-0.5">{{ req.targetPrice > 0 ? formatPrice(req.targetPrice) + ' / col' : 'Budget NC' }}</div>
                          </div>
                     </div>
                 </div>
             }
-            @if (requestList().length === 0) { <div class="p-8 text-center text-gray-400 text-sm">Aucune demande en cours.</div> }
+            @if (filteredRequests().length === 0) { <div class="p-8 text-center text-gray-400 text-sm">Aucune demande en cours.</div> }
         }
       </div>
 
@@ -107,6 +120,47 @@ import { AuthService } from '../../services/auth.service';
                             <div><label class="block text-xs font-bold text-gray-700 mb-1">Type</label><select [(ngModel)]="newOfferData.productType" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"><option value="VIN ROUGE">VIN ROUGE</option><option value="VIN BLANC">VIN BLANC</option><option value="CHAMPAGNE">CHAMPAGNE</option><option value="SPIRITUEUX">SPIRITUEUX</option></select></div>
                             <div><label class="block text-xs font-bold text-gray-700 mb-1">Région</label><input [(ngModel)]="newOfferData.region" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
                             <div><label class="block text-xs font-bold text-gray-700 mb-1">Prix Unitaire (HT)</label><input [(ngModel)]="newOfferData.price.unit" type="number" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-bold text-slate-900 focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">2</span> Technique & Logistique</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="space-y-4">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Régie</label><select [(ngModel)]="newOfferData.regie" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"><option value="CRD">CRD</option><option value="NON CRD">NON CRD</option></select></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Localisation</label><input [(ngModel)]="newOfferData.logistics.location" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Type Vendeur</label><input [(ngModel)]="newOfferData.condition.sellerType" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                            </div>
+                            <div class="space-y-4">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Format</label><input [(ngModel)]="newOfferData.logistics.unit" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Quantité</label><input [(ngModel)]="newOfferData.logistics.qty" type="number" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Caissage</label><input [(ngModel)]="newOfferData.logistics.packaging" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Bande de Garantie</label><input [(ngModel)]="newOfferData.logistics.guarantee" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                            </div>
+                            <div class="space-y-4">
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">État Général</label><input [(ngModel)]="newOfferData.condition.general" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Niveau</label><input [(ngModel)]="newOfferData.condition.level" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Capsule</label><input [(ngModel)]="newOfferData.condition.capsule" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                                <div><label class="block text-xs font-bold text-gray-700 mb-1">Étiquette</label><input [(ngModel)]="newOfferData.condition.label" type="text" class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-4 flex items-center gap-2"><span class="w-6 h-6 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[10px] font-bold">3</span> Photos</h3>
+                        <div class="space-y-3">
+                            <div class="flex gap-2">
+                                <input #newPhotoInput type="text" placeholder="URL de l'image (https://...)" class="flex-1 px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:bg-white focus:ring-1 focus:ring-slate-900 focus:outline-none">
+                                <button (click)="newOfferData.photos.push(newPhotoInput.value); newPhotoInput.value=''" class="px-4 py-2 bg-gray-200 text-gray-700 font-bold rounded-lg hover:bg-gray-300 text-sm">Ajouter</button>
+                            </div>
+                            <div class="flex gap-2 overflow-x-auto py-2">
+                                @for (photo of newOfferData.photos; track $index) {
+                                    <div class="relative w-16 h-16 rounded-md overflow-hidden group shrink-0 border border-gray-200">
+                                        <img [src]="photo" class="w-full h-full object-cover">
+                                        <button (click)="newOfferData.photos.splice($index, 1)" class="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                                        </button>
+                                    </div>
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -162,24 +216,48 @@ export class OffersListComponent {
   
   activeTab = signal<'OFFRES' | 'DEMANDES'>('OFFRES');
   statusFilter = signal<'TOUT' | 'DISPONIBLE' | 'A L\'ETUDE' | 'VENDU' | 'BROUILLON'>('TOUT');
+  searchQuery = signal(''); // Signal de recherche ajouté
+  
   isOfferCreationModalOpen = signal(false);
   isRequestCreationModalOpen = signal(false);
   newOfferData: any = {};
   newRequestData: any = {};
 
+  // OFFRES FILTRÉES AVEC RECHERCHE
   filteredOffers = computed(() => {
     const allOffers = this.offerService.offers();
     const currentUser = this.auth.currentUser();
     const status = this.statusFilter();
+    const search = this.searchQuery().toLowerCase();
+
     let offers: Offer[] = [];
     if (this.auth.isAdmin()) offers = allOffers;
     else if (this.auth.isSeller()) offers = allOffers.filter(o => o.ownerId === currentUser?.id);
     else if (this.auth.isBuyer()) offers = allOffers.filter(o => o.status !== 'BROUILLON');
+
     if (status !== 'TOUT') offers = offers.filter(o => o.status === status);
+    
+    // Filtre Recherche
+    if (search) {
+        offers = offers.filter(o => o.name.toLowerCase().includes(search) || o.ref.toLowerCase().includes(search));
+    }
+    
     return offers;
   });
 
-  requestList = computed(() => this.offerService.requests());
+  // DEMANDES FILTRÉES AVEC RECHERCHE
+  filteredRequests = computed(() => {
+      let reqs = this.offerService.requests();
+      const search = this.searchQuery().toLowerCase();
+      
+      // Filtre Recherche
+      if (search) {
+          reqs = reqs.filter(r => r.productName.toLowerCase().includes(search));
+      }
+      return reqs;
+  });
+  
+  requestList = computed(() => this.offerService.requests()); // Fallback si besoin, mais on utilise filteredRequests
 
   switchTab(tab: 'OFFRES' | 'DEMANDES') { this.activeTab.set(tab); this.router.navigate(['.'], { relativeTo: this.route }); }
   selectItem(id: number) { this.router.navigate([id], { relativeTo: this.route }); }

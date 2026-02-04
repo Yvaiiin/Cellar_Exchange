@@ -11,9 +11,9 @@ import { AuthService } from '../../services/auth.service';
     <header class="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-6 z-40 sticky top-0">
       
       <div class="flex items-center gap-3">
-        <div class="w-9 h-9 bg-slate-900 rounded flex items-center justify-center text-white font-bold text-lg font-mono">W</div>
+        <div class="w-9 h-9 bg-slate-900 rounded flex items-center justify-center text-white font-bold text-lg font-mono">CE</div>
         <span class="font-bold text-gray-900 tracking-tight text-lg">
-          WINE TRADING <span class="text-gray-400 font-normal text-sm">B2B</span>
+          CELLAR EXCHANGE <span class="text-gray-400 font-normal text-sm">Beta</span>
         </span>
       </div>
 
