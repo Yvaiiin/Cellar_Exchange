@@ -16,19 +16,25 @@ import { ActivatedRoute, Router } from '@angular/router';
       </div>
     } 
     
-    @if (request()) {
+@if (request()) {
         <div class="flex flex-col h-full bg-white relative">
-            <div class="flex px-6 py-3 border-b border-gray-100 justify-end items-center bg-white shadow-sm shrink-0 z-10 h-14">
+            
+            <div class="flex px-4 py-3 border-b border-gray-100 justify-between items-center bg-white shadow-sm shrink-0 z-10 h-14">
+               <div>
+                   <button (click)="goBack()" class="md:hidden p-2 -ml-2 text-slate-500 hover:text-slate-900 rounded-full hover:bg-slate-100 transition-colors">
+                       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+                   </button>
+               </div>
                @if (isRequestOwner()) {
-                  <button (click)="deleteRequest()" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider px-3 py-1 hover:bg-red-50 rounded transition-colors">Supprimer la demande</button>
+                  <button (click)="deleteRequest()" class="text-red-500 hover:text-red-700 text-xs font-bold uppercase tracking-wider px-3 py-1 hover:bg-red-50 rounded transition-colors">Supprimer</button>
                }
             </div>
 
-            <div class="flex-1 overflow-y-auto p-12 bg-white flex flex-col items-center pt-20">
-                <div class="w-full max-w-3xl bg-[#EEF2FF] rounded-xl p-12 text-center mb-10 shadow-sm border border-[#E0E7FF]">
-                    <h1 class="text-2xl font-bold text-[#313B85] mb-2 tracking-tight">RECHERCHE : {{ request()!.productName }}</h1>
-                    <div class="text-lg text-[#4F46E5] mb-8 font-medium">{{ request()!.vintage }} • {{ request()!.format }}</div>
-                    <div class="text-base text-slate-600 mb-8 font-bold">Quantité recherchée : {{ request()!.qty }}</div>
+            <div class="flex-1 overflow-y-auto p-4 md:p-12 bg-white flex flex-col items-center pt-10 md:pt-20 pb-24">
+                <div class="w-full max-w-3xl bg-[#EEF2FF] rounded-xl p-8 md:p-12 text-center mb-10 shadow-sm border border-[#E0E7FF]">
+                    <h1 class="text-xl md:text-2xl font-bold text-[#313B85] mb-2 tracking-tight">RECHERCHE : {{ request()!.productName }}</h1>
+                    <div class="text-base md:text-lg text-[#4F46E5] mb-8 font-medium">{{ request()!.vintage }} • {{ request()!.format }}</div>
+                    <div class="text-sm md:text-base text-slate-600 mb-8 font-bold">Quantité recherchée : {{ request()!.qty }}</div>
                     
                     <div class="inline-flex items-center justify-center px-6 py-2 bg-white rounded-full shadow-sm text-[#313B85] font-bold text-sm border border-[#E0E7FF]">
                         Budget Total : {{ request()!.targetPrice > 0 ? formatPrice(request()!.targetPrice * request()!.qty) : 'NC' }}
@@ -42,22 +48,39 @@ import { ActivatedRoute, Router } from '@angular/router';
                 </div>
             </div>
 
-            @if (!isRequestOwner()) {
-                <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-100 px-8 py-4 flex justify-end items-center z-20 h-20">
-                    <button (click)="openContactModal()" class="px-8 py-3 bg-[#313B85] hover:bg-[#232a63] text-white text-sm font-bold rounded-md shadow-lg shadow-indigo-900/10 transition-all transform active:scale-95">
+            <div class="absolute bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-4 flex justify-between items-center z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <div class="flex-1"></div> @if (isRequestOwner()) {
+                    <div class="text-xs font-bold text-gray-400 uppercase tracking-wide">C'est votre demande</div>
+                } @else {
+                    <button (click)="openContactModal()" class="w-full md:w-auto px-6 py-3 rounded-lg bg-[#313B85] text-white font-bold text-sm hover:bg-[#232a63] shadow-lg shadow-indigo-900/20 transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
                         Répondre
                     </button>
-                </div>
-            }
-        </div>
-    }
+                }
+            </div>
 
-    @if (offer()) {
+        </div>
+    }    
+@if (offer()) {
       <div class="flex flex-col h-full bg-white relative">
-        <div class="flex px-6 py-3 border-b border-gray-100 justify-between items-center bg-white shadow-sm shrink-0 z-10">
-          <div class="flex items-center gap-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
-            <span>Réf: {{ offer()!.ref }}</span><span>•</span><span>Ajouté le {{ offer()!.date }}</span>
-            @if (auth.isAdmin()) { <span class="ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold uppercase">Propriétaire : {{ getOwnerName(offer()!.ownerId) }}</span> }
+        
+        <div class="flex px-4 py-3 border-b border-gray-100 justify-between items-center bg-white shadow-sm shrink-0 z-10">
+          <div class="flex items-center gap-3">
+            
+            <button (click)="goBack()" class="md:hidden p-1.5 -ml-2 text-slate-500 hover:text-slate-900 rounded-full hover:bg-slate-100">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" /></svg>
+            </button>
+
+            <div class="flex items-center gap-2 text-xs font-regular text-gray-400 uppercase tracking-wider">
+               
+               <span class="hidden sm:inline">Réf: {{ offer()!.ref }}</span>
+
+               <span class="text-gray-300 hidden sm:inline">•</span>
+
+               <span>Ajouté le {{ offer()!.date }}</span>
+
+               @if (auth.isAdmin()) { <span class="ml-2 px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 border border-slate-200 text-[10px] font-bold uppercase">Propriétaire : {{ getOwnerName(offer()!.ownerId) }}</span> }
+            </div>
           </div>
           <div class="flex gap-2"><button (click)="copyData()" class="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-2 transition-colors">Copier</button><button class="px-3 py-1.5 text-xs font-medium text-gray-700 bg-white border border-gray-300 rounded hover:bg-gray-50 flex items-center gap-2 transition-colors">PDF</button></div>
         </div>
@@ -356,4 +379,7 @@ export class OfferDetailComponent {
   formatPrice(price: number): string { return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(price); }
   addPhoto(url: string) { if(url) this.editFormData.photos.push(url); }
   removePhoto(index: number) { this.editFormData.photos.splice(index, 1); }
+  goBack() {
+    this.router.navigate(['/app/offers']);
+  }
 }

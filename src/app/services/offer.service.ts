@@ -54,7 +54,7 @@ private mockOffers: Offer[] = [
       ref: 'MAR-15-BX',
       date: '02/02/2026',
       brokerNote: 'Caisse bois d\'origine non ouverte. Provenance directe propriété.',
-      photos: ['assets/CHTM.webp','assets/CHTM.webp']
+      photos: ['assets/CHTM.webp','assets/M2.webp']
     },
     {
       id: 2,
